@@ -1,0 +1,6 @@
+[requires]
+poco/1.9.4
+eigen/3.3.8
+
+[generators]
+cmake

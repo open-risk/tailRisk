@@ -1,0 +1,6 @@
+[
+ {"value": -100, "probability" : 0.1, "cumulative" : 0.1},
+ {"value": -20, "probability" : 0.3, "cumulative" : 0.4},
+ {"value": 0, "probability" : 0.4, "cumulative" : 0.8},
+ {"value": 50, "probability" : 0.2, "cumulative" : 1.0}
+]
