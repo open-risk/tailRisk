@@ -26,9 +26,11 @@ public:
             m_P.resize(S);
             m_C.resize(S);
             m_X.resize(S);
+            m_size = S;
         } else if (type == 1) {
             m_type = 1;
             m_S.resize(S);
+            m_size = S;
         } else {
             cout << "Error in random variable representation type" << endl;
         }
@@ -38,6 +40,7 @@ public:
 
     RandomVar(vec x, vec p, const int size) {
         m_type = 0;
+        m_size = size;
         m_X.resize(size);
         m_P.resize(size);
         m_C.resize(size);
@@ -52,7 +55,7 @@ public:
     RandomVar &operator=(const RandomVar &R);
 
     size_t size() const {
-        return m_P.size();
+        return m_size;
     };
 
     int type() const {
@@ -133,10 +136,11 @@ private:
     // 0 Type: exact representation
     // 1 Type: sampling representation
     int m_type;
-    vec m_P; // storage of probability mass
-    vec m_C; // storage of cumulative probability
-    vec m_X; // storage of discrete values (random variable range)
-    vec m_S; // storage of sampling data from simulation experiments
+    int m_size;
+    Col<double> m_P; // storage of probability mass
+    Col<double> m_C; // storage of cumulative probability
+    Col<double> m_X; // storage of discrete values (random variable range)
+    Col<double> m_S; // storage of sampling data from simulation experiments
 };
 
 #endif

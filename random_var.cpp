@@ -145,7 +145,7 @@ double RandomVar::Kurtosis() const {
  */
 int RandomVar::Quantile_Index(double alpha) const {
     int index = 0;
-    for (int i = 0; i< m_P.size(); i++) {
+    for (int i = 0; i < m_P.size(); i++) {
         if (m_C[i] > 1 - alpha) {
             index = i;
             break;
@@ -178,7 +178,7 @@ double RandomVar::ExpectedShortFall(double alpha) const {
     for (int k = iVaR; k < m_P.size(); k++) {
         es += m_P[k] * m_X[k];
     }
-      es /= alpha;
+    es /= alpha;
     return es;
 }
 

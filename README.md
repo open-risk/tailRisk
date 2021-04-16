@@ -1,17 +1,26 @@
 # tailRisk
-A library for the calculation of various tail risk measures
+A C++ library for the calculation of various tail risk measures
 
-PRELIMINARY RELEASE
+**NB: PRELIMINARY RELEASE**
+
+## Documentation
+**NB: Documentation still under development.**
+
+* Implemented [Risk Measures](RiskMeasures.md)
+* Mathematical Documentation available [here](https://www.openriskmanual.org/wiki/Category:Tail_Risk) 
+
 
 ## Dependencies
-* Poco
-* Armadillo
 
-## Examples
+* Armadillo (Data container and calculation library)
+* Poco (For parsing JSON inputs)
+* Stats (A C++ header-only library of statistical distribution functions.)
+
+## Example
 The data directory contains sample datafiles with various sampled distributions
 
 ```c++
-    // Reading in some data for a type 0 representation (discrete distribution)
+    // Read in some data for a type 0 representation (discrete distribution)
 int LossGrid = 1000;
 int DataType = 0;
 RandomVar L(LossGrid, DataType);

@@ -1,6 +1,7 @@
 [requires]
 poco/1.9.4
 eigen/3.3.8
+statslib/3.1.1
 
 [generators]
 cmake

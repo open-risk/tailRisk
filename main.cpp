@@ -7,6 +7,7 @@
  *
  */
 
+#include <armadillo>
 #include "random_var.h"
 
 int main(int argc, char *argv[]) {
@@ -15,7 +16,7 @@ int main(int argc, char *argv[]) {
     int LossGrid = 1000;
     int DataType = 0;
     RandomVar L(LossGrid, DataType);
-    L.ReadFromJSON("../data/example5.json");
+    L.ReadFromJSON("../../data/example5.json");
     L.Print();
 
     // Calculate various measures
