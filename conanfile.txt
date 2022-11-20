@@ -1,7 +1,8 @@
 [requires]
-poco/1.9.4
-eigen/3.3.8
-statslib/3.1.1
+eigen/3.4.0
+statslib/3.2.0
 
 [generators]
 cmake
+cmake_find_package
+cmake_paths

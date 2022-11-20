@@ -1,18 +1,35 @@
-/** 
+/*################################################################################
+  ##
+  ##   Copyright (C) 2020-2022 Open Risk (www.openriskmanagement.com)
+  ##
+  ##   This file is part of the tailRisk C++ library.
+  ##
+  ##   Licensed under the Apache License, Version 2.0 (the "License");
+  ##   you may not use this file except in compliance with the License.
+  ##   You may obtain a copy of the License at
+  ##
+  ##       http://www.apache.org/licenses/LICENSE-2.0
+  ##
+  ##   Unless required by applicable law or agreed to in writing, software
+  ##   distributed under the License is distributed on an "AS IS" BASIS,
+  ##   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ##   See the License for the specific language governing permissions and
+  ##   limitations under the License.
+  ##
+  ################################################################################*/
+
+/**
  * File: random_var.cpp
  * Date: Mon Nov  9 10:31:35 CET 2020
- * Author: Open Risk  (www.openriskmanagement.com)
- *
  */
 
 #include <cmath>
 #include <iostream>
 #include <cassert>
+#include <fstream>
 
-#include <Poco/JSON/JSON.h>
+
 #include <Poco/JSON/Parser.h>
-#include <armadillo>
-
 #include "random_var.h"
 
 using namespace Poco;
@@ -28,40 +45,43 @@ RandomVar &RandomVar::operator=(const RandomVar &R) {
 };
 
 /**
- * ... text ...
+ * Sort the sampling data
  */
 void RandomVar::Sort() {
-    arma::sort(m_S);
+    std::sort(m_S.begin(), m_S.end());
 }
 
 /**
- * ... text ...
+ * Compute the cumulative distribution function
  */
 void RandomVar::Cumulative() {
-    m_C[0] = m_P[0];
+    m_C[0] = m_P[0]; // starting value
     for (size_t i = 1; i < m_P.size(); i++)
-        m_C[i] = m_C[i - 1] + m_P[i];
+        m_C[i] = m_C[i - 1] + m_P[i];  // add probability mass
 }
 
 /**
- * ... text ...
+ * Compute the probability density
  */
 void RandomVar::Probability() {
-    m_P[0] = m_C[0];
+    m_P[0] = m_C[0];  // starting valued
     for (size_t i = 1; i < m_P.size(); i++)
-        m_P[i] = m_C[i] - m_C[i - 1];
+        m_P[i] = m_C[i] - m_C[i - 1];  // incremental probability mass
 }
 
 /**
- * ... text ...
+ * Compute the average value
+ * The calculation depends on how the data are stored
  */
 double RandomVar::Average() const {
     double expectation = 0.0;
+    // from probability mass
     if (m_type == 0) {
         for (size_t i = 0; i < m_P.size(); i++) {
             expectation += m_P[i] * m_X[i];
         }
-    } else if (m_type == 1) {
+    } // from samples
+    else if (m_type == 1) {
         for (size_t i = 0; i < m_S.size(); ++i) {
             expectation += m_S[i];
         }
@@ -71,21 +91,22 @@ double RandomVar::Average() const {
 }
 
 /**
- * ... text ...
+ * Synonym for Average
  */
 double RandomVar::Mean() const {
     return Average();
 }
 
 /**
- * ... text ...
+ * Median as Quantile(0.5)
  */
 double RandomVar::Median() const {
     return Quantile(0.5);
 }
 
 /**
- * ... text ...
+ * Compute the variance
+ * The calculation depends on how the data are stored
  */
 double RandomVar::Variance() const {
     double var = 0;
@@ -103,107 +124,134 @@ double RandomVar::Variance() const {
 }
 
 /**
- * ... text ...
+ * Compute volatility (standard deviation)
  */
 double RandomVar::Vol() const {
     return sqrt(Variance());
 }
-
-/**
- * ... text ...
- */
 double RandomVar::StandardDeviation() const {
     return Vol();
 }
 
 /**
- * ... text ...
+ * Compute the skeweness
+ * The calculation depends on how the data are stored
  */
+// TODO Type 1 calculation
 double RandomVar::Skeweness() const {
     double skew = 0;
-    double mean = Average();
-    for (size_t i = 0; i < m_P.size(); i++)
-        skew += m_P[i] * pow(m_X[i] - mean, 3);
-    skew = skew / pow(Variance(), 3 / 2);
+    if (m_type == 0) {
+        double mean = Average();
+        for (size_t i = 0; i < m_P.size(); i++)
+            skew += m_P[i] * pow(m_X[i] - mean, 3);
+        skew = skew / pow(Variance(), 3 / 2);
+    }
     return skew;
 }
 
 /**
- * ... text ...
+ * Compute the kurtosis
+ * The calculation depends on how the data are stored
  */
+// TODO Type 1 calculation
 double RandomVar::Kurtosis() const {
     double kurt = 0;
-    double mean = Average();
-    for (size_t i = 0; i < m_P.size(); i++)
-        kurt += m_P[i] * pow(m_X[i] - mean, 4);
-    kurt = kurt / pow(Variance(), 2);
+    if (m_type == 0){
+        double mean = Average();
+        for (size_t i = 0; i < m_P.size(); i++)
+            kurt += m_P[i] * pow(m_X[i] - mean, 4);
+        kurt = kurt / pow(Variance(), 2);
+    }
     return kurt;
 }
 
 /**
- * ... text ...
+ * Compute the Quantile Index
+ * The calculation depends on how the data are stored
  */
+// TODO Type 1 calculation
 int RandomVar::Quantile_Index(double alpha) const {
     int index = 0;
-    for (int i = 0; i < m_P.size(); i++) {
-        if (m_C[i] > 1 - alpha) {
-            index = i;
-            break;
+    if (m_type == 0)
+    {
+        for (int i = 0; i < m_P.size(); i++) {
+            if (m_C[i] > 1 - alpha) {
+                index = i;
+                break;
+            }
         }
     }
     return index;
 }
 
 /**
- * ... text ...
+ * Compute the Quantile
+ * The calculation depends on how the data are stored
  */
+// TODO Type 1 calculation
 double RandomVar::Quantile(double alpha) const {
-    int index = this->Quantile_Index(alpha);
-    return m_X[index];
+    double q;
+    if (m_type ==0) {
+        int index = this->Quantile_Index(alpha);
+        q = m_X[index];
+    }
+    return q;
 }
 
 /**
- * ... text ...
+ * Compute Value-at-Risk
  */
 double RandomVar::VaR(double alpha) const {
     return Quantile(1.0 - alpha);
 }
 
 /**
- * ... text ...
+ * Compute Expected Shortfall
  */
+// TODO Type 1 calculation
 double RandomVar::ExpectedShortFall(double alpha) const {
-    int iVaR = this->Quantile_Index(alpha);
     double es = 0;
-    for (int k = iVaR; k < m_P.size(); k++) {
-        es += m_P[k] * m_X[k];
+    if (m_type == 0) {
+        int iVaR = this->Quantile_Index(alpha);
+        for (int k = iVaR; k < m_P.size(); k++) {
+            es += m_P[k] * m_X[k];
+        }
+        es /= alpha;
     }
-    es /= alpha;
     return es;
 }
 
 /**
- * ... text ...
+ * Compute Expeedance Probability
  */
+// TODO Type 1 calculation
 double RandomVar::ExceedanceProbability(int index) const {
     double ep = 0;
-    for (size_t k = index; k < m_P.size(); k++)
-        ep += m_P[k];
+    if (m_type == 0){
+        for (size_t k = index; k < m_P.size(); k++)
+            ep += m_P[k];
+    }
     return ep;
 }
 
 /**
- * ... text ...
+ * Compute Mean Excess
  */
+// TODO Type 1 calculation
 double RandomVar::MeanExcess(int index) const {
-    double alpha = ExceedanceProbability(index);
-    double es = 0;
-    for (size_t k = index; k < m_P.size(); k++)
-        es += m_P[k] * m_X[k];
-    es /= alpha;
-    return es;
+    double mx = 0;
+    if (m_type == 0) {
+        double alpha = ExceedanceProbability(index);
+        for (size_t k = index; k < m_P.size(); k++)
+            mx += m_P[k] * m_X[k];
+        mx /= alpha;
+    }
+    return mx;
 }
 
+/**
+ * overload << operator
+ */
 std::ostream &operator<<(std::ostream &os, const RandomVar &R) {
     std::ostringstream out;
     for (size_t k = 0; k < R.size(); k++)
@@ -211,28 +259,26 @@ std::ostream &operator<<(std::ostream &os, const RandomVar &R) {
     return os << out.str();
 };
 
+/**
+ * Print a representation
+ */
 void RandomVar::Print() {
     if (this->m_type == 1) {
         for (size_t s = 0; s < this->m_S.size(); s++) {
-            cout << s << "\t" << this->m_S[s] << std::endl;
+            std::cout << s << "\t" << this->m_S[s] << std::endl;
         }
     } else if (this->m_type == 0) {
         for (size_t s = 0; s < this->m_X.size(); s++) {
-            cout << s << "\t" << this->m_X[s] << "\t" << this->m_P[s] << "\t" << this->m_C[s] << std::endl;
+            std::cout << s << "\t" << this->m_X[s] << "\t" << this->m_P[s] << "\t" << this->m_C[s] << std::endl;
         }
     }
 }
 
-void RandomVar::ReadFromJSON(const char *fileName) {
-
-    Poco::JSON::Parser loParser;
-    std::ifstream t(fileName);
-    std::stringstream buffer;
-    buffer << t.rdbuf();
-    std::string json = buffer.str();
-    // Parse the JSON and get the Results
-    Poco::Dynamic::Var loParsedJson = loParser.parse(json);
-    Poco::Dynamic::Var loParsedJsonResult = loParser.result();
+/**
+ * Read random variable from JSON
+ * @param fileName
+ */
+void RandomVar::ReadFromJSON(const std::string &filename) {
 
     // Random variable data are an array of objects
     //[
@@ -241,11 +287,21 @@ void RandomVar::ReadFromJSON(const char *fileName) {
     // {"value": 3, "probability" : 0.2, "cumulative" : 0.6},
     // {"value": 4, "probability" : 0.2, "cumulative" : 0.8},
     // {"value": 5, "probability" : 0.2, "cumulative" : 1.0}
-    //]    
+    //]
 
-    Poco::JSON::Array::Ptr arr = loParsedJsonResult.extract<Poco::JSON::Array::Ptr>();
+    Poco::JSON::Parser Parser;
+    const char *cstr = filename.c_str();
+    std::ifstream t(cstr);
+    std::stringstream buffer;
+    buffer << t.rdbuf();
+    std::string json = buffer.str();
+    // Parse the JSON and get the Results
+    Parser.parse(json);
+    Poco::Dynamic::Var ParsedJsonResult = Parser.result();
+
+    Poco::JSON::Array::Ptr arr = ParsedJsonResult.extract<Poco::JSON::Array::Ptr>();
     size_t size = arr->size();
-    cout << "Reading " << size << " records." << endl;
+    std::cout << "Reading " << size << " records." << std::endl;
 
     m_P.resize(size);
     m_C.resize(size);
@@ -259,5 +315,4 @@ void RandomVar::ReadFromJSON(const char *fileName) {
         this->setP(i, object->getValue<double>("probability"));
         this->setC(i, object->getValue<double>("cumulative"));
     }
-
 }

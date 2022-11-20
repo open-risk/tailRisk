@@ -1,8 +1,6 @@
 # tailRisk
 A C++ library for the calculation of various tail risk measures
 
-**NB: PRELIMINARY RELEASE**
-
 ## Documentation
 **NB: Documentation still under development.**
 

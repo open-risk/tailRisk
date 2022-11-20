@@ -1,24 +1,43 @@
-/** 
+/*################################################################################
+  ##
+  ##   Copyright (C) 2020-2022 Open Risk (www.openriskmanagement.com)
+  ##
+  ##   This file is part of the tailRisk C++ library.
+  ##
+  ##   Licensed under the Apache License, Version 2.0 (the "License");
+  ##   you may not use this file except in compliance with the License.
+  ##   You may obtain a copy of the License at
+  ##
+  ##       http://www.apache.org/licenses/LICENSE-2.0
+  ##
+  ##   Unless required by applicable law or agreed to in writing, software
+  ##   distributed under the License is distributed on an "AS IS" BASIS,
+  ##   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ##   See the License for the specific language governing permissions and
+  ##   limitations under the License.
+  ##
+  ################################################################################*/
+
+
+/**
  * File:   random_var.h
  * Date: Mon Nov  9 10:31:35 CET 2020
- * Author: Open Risk  (www.openriskmanagement.com)
- *
  */
 
 #ifndef RANDOM_VARIABLE_H
 #define RANDOM_VARIABLE_H
 
 #include <iostream>
-#include <armadillo>
-
-using namespace arma;
+#include <Eigen/Dense>
 
 class RandomVar {
     friend std::ostream &operator<<(std::ostream &os, const RandomVar &R);
 
 public:
 
-    // constructor with size and distribution type
+    // constructor with size and empirical distribution type
+    // Type 0 -> histogram
+    // Type 1 -> samples
 
     RandomVar(size_t S, int type) {
         if (type == 0) {
@@ -32,13 +51,14 @@ public:
             m_S.resize(S);
             m_size = S;
         } else {
-            cout << "Error in random variable representation type" << endl;
+            std::cout << "Error in random variable representation type" << std::endl;
         }
     }
 
     // constructor directly from existing data
+    // TODO generalize data type to accommodate different accuracy requirements
 
-    RandomVar(vec x, vec p, const int size) {
+    RandomVar(Eigen::ArrayXd x, Eigen::ArrayXd p, const int size) {
         m_type = 0;
         m_size = size;
         m_X.resize(size);
@@ -54,29 +74,57 @@ public:
 
     RandomVar &operator=(const RandomVar &R);
 
-    size_t size() const {
+    [[nodiscard]] size_t size() const {
         return m_size;
     };
 
-    int type() const {
+    [[nodiscard]] int type() const {
         return m_type;
     };
 
-    double getP(int index) const {
+    [[nodiscard]] double getP(int index) const {
         return m_P[index];
     };
 
-    double getC(int index) const {
+    [[nodiscard]] double getC(int index) const {
         return m_C[index];
     };
 
-    double getX(int index) const {
+    [[nodiscard]] double getX(int index) const {
         return m_X[index];
     };
 
-    double getS(int index) const {
+    [[nodiscard]] double getS(int index) const {
         return m_S[index];
     };
+
+    [[nodiscard]] double Average() const;
+
+    [[nodiscard]] double Mean() const;
+
+    [[nodiscard]] double Median() const;
+
+    [[nodiscard]] double Variance() const;
+
+    [[nodiscard]] double Vol() const;
+
+    [[nodiscard]] double StandardDeviation() const;
+
+    [[nodiscard]] double Kurtosis() const;
+
+    [[nodiscard]] double Skeweness() const;
+
+    [[nodiscard]] double ExpectedShortFall(double alpha) const;
+
+    [[nodiscard]] double ExceedanceProbability(int index) const;
+
+    [[nodiscard]] double MeanExcess(int index) const;
+
+    [[nodiscard]] double Quantile(double alpha) const;
+
+    [[nodiscard]] double VaR(double alpha) const;
+
+    [[nodiscard]] int Quantile_Index(double alpha) const;
 
     void setP(int index, double arg) {
         m_P[index] = arg;
@@ -100,35 +148,7 @@ public:
 
     void Probability();
 
-    double Average() const;
-
-    double Mean() const;
-
-    double Median() const;
-
-    double Variance() const;
-
-    double Vol() const;
-
-    double StandardDeviation() const;
-
-    double Kurtosis() const;
-
-    double Skeweness() const;
-
-    double ExpectedShortFall(double alpha) const;
-
-    double ExceedanceProbability(int index) const;
-
-    double MeanExcess(int index) const;
-
-    double Quantile(double alpha) const;
-
-    double VaR(double alpha) const;
-
-    int Quantile_Index(double alpha) const;
-
-    void ReadFromJSON(const char *fileName);
+    void ReadFromJSON(const std::string &filename);
 
     void Print();
 
@@ -137,10 +157,10 @@ private:
     // 1 Type: sampling representation
     int m_type;
     int m_size;
-    Col<double> m_P; // storage of probability mass
-    Col<double> m_C; // storage of cumulative probability
-    Col<double> m_X; // storage of discrete values (random variable range)
-    Col<double> m_S; // storage of sampling data from simulation experiments
+    Eigen::ArrayXd m_P{}; // storage of probability mass
+    Eigen::ArrayXd m_C{}; // storage of cumulative probability
+    Eigen::ArrayXd m_X{}; // storage of discrete values (random variable range)
+    Eigen::ArrayXd m_S{}; // storage of sampling data from simulation experiments
 };
 
 #endif
