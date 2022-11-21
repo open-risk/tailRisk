@@ -26,7 +26,6 @@
  *
  */
 
-#include <armadillo>
 #include "random_var.h"
 
 int main(int argc, char *argv[]) {

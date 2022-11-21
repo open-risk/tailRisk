@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.22)
 project(tailRisk)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -11,18 +11,31 @@ set(CONAN_DISABLE_CHECK_COMPILER ON)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
+include_directories(..)
+include_directories(.)
+
 # tailRisk version
 set(VERSION 0.1.0)
 
-set(SOURCE_FILES main.cpp random_var.cpp)
+set(SOURCE_FILES
+        random_var.cpp
+        random_var.h)
 
-set(TEST_FILES testing.cpp random_var.cpp)
+set(TEST_FILES
+        testing/test_factorial.cpp
+        testing/test_vectors.cpp
+        testing/test_random_var.cpp)
 
 find_package(Poco REQUIRED COMPONENTS Foundation JSON)
+find_package(Catch2)
 
-add_executable(tailRisk ${SOURCE_FILES})
+add_executable(tailRisk main.cpp ${SOURCE_FILES})
 target_link_libraries(tailRisk "${POCO_LIBS}"  Poco::Foundation Poco::JSON)
 
-add_executable(testing ${TEST_FILES})
+# CATCH2 TESTING
+include(Catch)
+enable_testing()
+add_executable(testing ${SOURCE_FILES} ${TEST_FILES})
 target_include_directories(testing PRIVATE $(POCO_INCLUDE_DIR))
-target_link_libraries(testing "${POCO_LIBS}"  Poco::Foundation Poco::JSON)
+target_link_libraries(testing "${POCO_LIBS}" Poco::Foundation Poco::JSON Catch2::Catch2WithMain)
+catch_discover_tests(testing)
