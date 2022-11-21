@@ -1,26 +1,26 @@
 /*################################################################################
-  ##
-  ##   Copyright (C) 2020-2022 Open Risk (www.openriskmanagement.com)
-  ##
-  ##   This file is part of the tailRisk C++ library.
-  ##
-  ##   Licensed under the Apache License, Version 2.0 (the "License");
-  ##   you may not use this file except in compliance with the License.
-  ##   You may obtain a copy of the License at
-  ##
-  ##       http://www.apache.org/licenses/LICENSE-2.0
-  ##
-  ##   Unless required by applicable law or agreed to in writing, software
-  ##   distributed under the License is distributed on an "AS IS" BASIS,
-  ##   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ##   See the License for the specific language governing permissions and
-  ##   limitations under the License.
-  ##
-  ################################################################################*/
+ ##
+ ##  Copyright (C) 2020-2022 Open Risk (www.openriskmanagement.com)
+ ##
+ ##  This file is part of the tailRisk C++ library.
+ ##
+ ##  Licensed under the Apache License, Version 2.0 (the "License");
+ ##  you may not use this file except in compliance with the License.
+ ##  You may obtain a copy of the License at
+ ##
+ ##    http://www.apache.org/licenses/LICENSE-2.0
+ ##
+ ##  Unless required by applicable law or agreed to in writing, software
+ ##  distributed under the License is distributed on an "AS IS" BASIS,
+ ##  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ##  See the License for the specific language governing permissions and
+ ##  limitations under the License.
+ ##
+ ################################################################################*/
 
 /**
  * File: random_var.cpp
- * Date: Mon Nov  9 10:31:35 CET 2020
+ * Date: Mon Nov 9 10:31:35 CET 2020
  */
 
 #include <cmath>
@@ -34,6 +34,11 @@
 
 using namespace Poco;
 
+/**
+ * Assignment Operator
+ * @param R
+ * @return
+ */
 RandomVar &RandomVar::operator=(const RandomVar &R) {
     assert(R.size() == this->size()); // check that size matches
     for (size_t i = 0; i < R.size(); i++) {
@@ -48,7 +53,10 @@ RandomVar &RandomVar::operator=(const RandomVar &R) {
  * Sort the sampling data
  */
 void RandomVar::Sort() {
-    std::sort(m_S.begin(), m_S.end());
+    if (m_sorted == false) {
+        std::sort(m_S.begin(), m_S.end());
+    }
+    m_sorted = true;
 }
 
 /**
@@ -57,23 +65,23 @@ void RandomVar::Sort() {
 void RandomVar::Cumulative() {
     m_C[0] = m_P[0]; // starting value
     for (size_t i = 1; i < m_P.size(); i++)
-        m_C[i] = m_C[i - 1] + m_P[i];  // add probability mass
+        m_C[i] = m_C[i - 1] + m_P[i]; // add probability mass
 }
 
 /**
  * Compute the probability density
  */
 void RandomVar::Probability() {
-    m_P[0] = m_C[0];  // starting valued
+    m_P[0] = m_C[0]; // starting valued
     for (size_t i = 1; i < m_P.size(); i++)
-        m_P[i] = m_C[i] - m_C[i - 1];  // incremental probability mass
+        m_P[i] = m_C[i] - m_C[i - 1]; // incremental probability mass
 }
 
 /**
  * Compute the average value
  * The calculation depends on how the data are stored
  */
-double RandomVar::Average() const {
+double RandomVar::Average() {
     double expectation = 0.0;
     // from probability mass
     if (m_type == 0) {
@@ -93,14 +101,14 @@ double RandomVar::Average() const {
 /**
  * Synonym for Average
  */
-double RandomVar::Mean() const {
+double RandomVar::Mean() {
     return Average();
 }
 
 /**
  * Median as Quantile(0.5)
  */
-double RandomVar::Median() const {
+double RandomVar::Median() {
     return Quantile(0.5);
 }
 
@@ -108,17 +116,17 @@ double RandomVar::Median() const {
  * Compute the variance
  * The calculation depends on how the data are stored
  */
-double RandomVar::Variance() const {
+double RandomVar::Variance() {
     double var = 0;
+    double mean = Average();
     if (m_type == 0) {
         for (size_t i = 0; i < m_P.size(); i++)
             var += m_P[i] * m_X[i] * m_X[i];
-        var -= Average() * Average();
+        var -= mean * mean;
     } else if (m_type == 1) {
         for (size_t i = 0; i < m_S.size(); i++)
-            var += m_S[i] * m_S[i];
-        var /= m_S.size();
-        var -= Average() * Average();
+            var += (m_S[i] - mean) * (m_S[i] - mean);
+        var /= (m_S.size() - 1) ;
     }
     return var;
 }
@@ -126,10 +134,11 @@ double RandomVar::Variance() const {
 /**
  * Compute volatility (standard deviation)
  */
-double RandomVar::Vol() const {
+double RandomVar::Vol() {
     return sqrt(Variance());
 }
-double RandomVar::StandardDeviation() const {
+
+double RandomVar::StandardDeviation() {
     return Vol();
 }
 
@@ -138,7 +147,7 @@ double RandomVar::StandardDeviation() const {
  * The calculation depends on how the data are stored
  */
 // TODO Type 1 calculation
-double RandomVar::Skeweness() const {
+double RandomVar::Skeweness() {
     double skew = 0;
     if (m_type == 0) {
         double mean = Average();
@@ -154,9 +163,9 @@ double RandomVar::Skeweness() const {
  * The calculation depends on how the data are stored
  */
 // TODO Type 1 calculation
-double RandomVar::Kurtosis() const {
+double RandomVar::Kurtosis() {
     double kurt = 0;
-    if (m_type == 0){
+    if (m_type == 0) {
         double mean = Average();
         for (size_t i = 0; i < m_P.size(); i++)
             kurt += m_P[i] * pow(m_X[i] - mean, 4);
@@ -170,16 +179,18 @@ double RandomVar::Kurtosis() const {
  * The calculation depends on how the data are stored
  */
 // TODO Type 1 calculation
-int RandomVar::Quantile_Index(double alpha) const {
+int RandomVar::Quantile_Index(double alpha) {
     int index = 0;
-    if (m_type == 0)
-    {
+    if (m_type == 0) {
         for (int i = 0; i < m_P.size(); i++) {
             if (m_C[i] > 1 - alpha) {
                 index = i;
                 break;
             }
         }
+    } else if (m_type == 1) {
+        this->Sort();
+        index =  alpha * this->size();
     }
     return index;
 }
@@ -189,11 +200,14 @@ int RandomVar::Quantile_Index(double alpha) const {
  * The calculation depends on how the data are stored
  */
 // TODO Type 1 calculation
-double RandomVar::Quantile(double alpha) const {
+double RandomVar::Quantile(double alpha) {
     double q;
-    if (m_type ==0) {
-        int index = this->Quantile_Index(alpha);
+    int index = this->Quantile_Index(alpha);
+    if (m_type == 0) {
         q = m_X[index];
+    }
+    else if (m_type == 1){
+        q = m_S[index];
     }
     return q;
 }
@@ -201,7 +215,7 @@ double RandomVar::Quantile(double alpha) const {
 /**
  * Compute Value-at-Risk
  */
-double RandomVar::VaR(double alpha) const {
+double RandomVar::VaR(double alpha) {
     return Quantile(1.0 - alpha);
 }
 
@@ -209,7 +223,7 @@ double RandomVar::VaR(double alpha) const {
  * Compute Expected Shortfall
  */
 // TODO Type 1 calculation
-double RandomVar::ExpectedShortFall(double alpha) const {
+double RandomVar::ExpectedShortFall(double alpha) {
     double es = 0;
     if (m_type == 0) {
         int iVaR = this->Quantile_Index(alpha);
@@ -225,9 +239,9 @@ double RandomVar::ExpectedShortFall(double alpha) const {
  * Compute Expeedance Probability
  */
 // TODO Type 1 calculation
-double RandomVar::ExceedanceProbability(int index) const {
+double RandomVar::ExceedanceProbability(int index) {
     double ep = 0;
-    if (m_type == 0){
+    if (m_type == 0) {
         for (size_t k = index; k < m_P.size(); k++)
             ep += m_P[k];
     }
@@ -238,7 +252,7 @@ double RandomVar::ExceedanceProbability(int index) const {
  * Compute Mean Excess
  */
 // TODO Type 1 calculation
-double RandomVar::MeanExcess(int index) const {
+double RandomVar::MeanExcess(int index) {
     double mx = 0;
     if (m_type == 0) {
         double alpha = ExceedanceProbability(index);

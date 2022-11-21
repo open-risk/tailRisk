@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.10)
 project(tailRisk)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS -std=c++11)
-set(CMAKE_VERBOSE_MAKEFILE on )
+set(CMAKE_VERBOSE_MAKEFILE on)
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS_DEBUG)
 set(CONAN_DISABLE_CHECK_COMPILER ON)
@@ -22,15 +22,14 @@ set(SOURCE_FILES
         random_var.h)
 
 set(TEST_FILES
-        testing/test_factorial.cpp
-        testing/test_vectors.cpp
-        testing/test_random_var.cpp)
+        testing/test_random_var_bernulli.cpp
+        testing/test_random_var_beta.cpp testing/test_random_var_binomial.cpp testing/test_random_var_normal.cpp testing/test_random_var_uniform.cpp)
 
 find_package(Poco REQUIRED COMPONENTS Foundation JSON)
 find_package(Catch2)
 
 add_executable(tailRisk main.cpp ${SOURCE_FILES})
-target_link_libraries(tailRisk "${POCO_LIBS}"  Poco::Foundation Poco::JSON)
+target_link_libraries(tailRisk "${POCO_LIBS}" Poco::Foundation Poco::JSON)
 
 # CATCH2 TESTING
 include(Catch)

@@ -36,8 +36,8 @@ class RandomVar {
 public:
 
     // constructor with size and empirical distribution type
-    // Type 0 -> histogram
-    // Type 1 -> samples
+    // Type 0 -> histogram storage
+    // Type 1 -> sample storage
 
     RandomVar(size_t S, int type) {
         if (type == 0) {
@@ -71,9 +71,12 @@ public:
     }
 
     // overload assignment operator
-
     RandomVar &operator=(const RandomVar &R);
 
+    /**
+     *
+     * @return
+     */
     [[nodiscard]] size_t size() const {
         return m_size;
     };
@@ -98,33 +101,34 @@ public:
         return m_S[index];
     };
 
-    [[nodiscard]] double Average() const;
+    [[nodiscard]] double Average();
 
-    [[nodiscard]] double Mean() const;
+    [[nodiscard]] double Mean();
 
-    [[nodiscard]] double Median() const;
+    [[nodiscard]] double Median();
 
-    [[nodiscard]] double Variance() const;
+    [[nodiscard]] double Variance();
 
-    [[nodiscard]] double Vol() const;
+    [[nodiscard]] double Vol();
 
-    [[nodiscard]] double StandardDeviation() const;
+    [[nodiscard]] double StandardDeviation();
 
-    [[nodiscard]] double Kurtosis() const;
+    [[nodiscard]] double Kurtosis();
 
-    [[nodiscard]] double Skeweness() const;
+    [[nodiscard]] double Skeweness();
 
-    [[nodiscard]] double ExpectedShortFall(double alpha) const;
+    [[nodiscard]] double ExpectedShortFall(double alpha);
 
-    [[nodiscard]] double ExceedanceProbability(int index) const;
+    [[nodiscard]] double ExceedanceProbability(int index);
 
-    [[nodiscard]] double MeanExcess(int index) const;
+    [[nodiscard]] double MeanExcess(int index);
 
-    [[nodiscard]] double Quantile(double alpha) const;
+    [[nodiscard]] int Quantile_Index(double alpha);
 
-    [[nodiscard]] double VaR(double alpha) const;
+    [[nodiscard]] double Quantile(double alpha);
 
-    [[nodiscard]] int Quantile_Index(double alpha) const;
+    [[nodiscard]] double VaR(double alpha);
+
 
     void setP(int index, double arg) {
         m_P[index] = arg;
@@ -156,7 +160,11 @@ private:
     // 0 Type: exact representation
     // 1 Type: sampling representation
     int m_type;
+
     int m_size;
+
+    bool m_sorted = false;
+
     Eigen::ArrayXd m_P{}; // storage of probability mass
     Eigen::ArrayXd m_C{}; // storage of cumulative probability
     Eigen::ArrayXd m_X{}; // storage of discrete values (random variable range)
