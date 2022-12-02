@@ -39,12 +39,19 @@ using namespace Poco;
  * @param R
  * @return
  */
-RandomVar &RandomVar::operator=(const RandomVar &R) {
+RandomVar &RandomVar::operator=( RandomVar &R) {
     assert(R.size() == this->size()); // check that size matches
-    for (size_t i = 0; i < R.size(); i++) {
-        this->setX(i, R.getX(i));
-        this->setP(i, R.getP(i));
-        this->setC(i, R.getC(i));
+    if (m_type == 0) {
+        for (size_t i = 0; i < R.size(); i++) {
+            this->setX(i, R.getX(i));
+            this->setP(i, R.getP(i));
+            this->setC(i, R.getC(i));
+        }
+    }
+    else if (m_type == 1){
+        for (size_t i = 0; i < R.size(); i++) {
+            this->setS(i, R.getS(i));
+        }
     }
     return (*this);
 };
@@ -53,35 +60,66 @@ RandomVar &RandomVar::operator=(const RandomVar &R) {
  * Sort the sampling data
  */
 void RandomVar::Sort() {
-    if (m_sorted == false) {
-        std::sort(m_S.begin(), m_S.end());
+    if (m_type == 1) {
+        if (m_sorted == false) {
+            std::sort(m_S.begin(), m_S.end());
+        }
+        m_sorted = true;
     }
-    m_sorted = true;
+}
+
+/**
+ * Create a histogram of the sampling data
+ * This is a rough-and-ready approach for data visualization
+ * Bins are assumed equal and represented by their mid-point values
+ */
+RandomVar RandomVar::Histogram(int Bins) {
+    RandomVar H(Bins+1,0);
+    if (m_type == 1) {
+        std::sort(m_S.begin(), m_S.end());
+        double min_value = m_S[0];
+        double max_value = m_S[m_S.size()-1];
+        double bin_width = (max_value - min_value)/ (double) Bins;
+        double sample_p = 1.0 / m_size;
+        for (int i = 0; i < Bins + 1; i++) {
+            H.setX(i, min_value + bin_width * (double) i / 2.0);
+            H.setP(i, 0.0);
+        }
+        for (int j = 0; j < m_size; j++) {
+            int observation_bin = (int) ( (m_S[j] - min_value) / bin_width );
+            H.addP(observation_bin, sample_p);
+        }
+    }
+    return H;
 }
 
 /**
  * Compute the cumulative distribution function
  */
 void RandomVar::Cumulative() {
-    m_C[0] = m_P[0]; // starting value
-    for (size_t i = 1; i < m_P.size(); i++)
-        m_C[i] = m_C[i - 1] + m_P[i]; // add probability mass
+    if (m_type == 0) {
+        m_C[0] = m_P[0]; // starting value
+        for (size_t i = 1; i < m_P.size(); i++)
+            m_C[i] = m_C[i - 1] + m_P[i];  // add probability mass
+    }
 }
 
 /**
  * Compute the probability density
  */
 void RandomVar::Probability() {
-    m_P[0] = m_C[0]; // starting valued
-    for (size_t i = 1; i < m_P.size(); i++)
-        m_P[i] = m_C[i] - m_C[i - 1]; // incremental probability mass
+    if (m_type == 1){
+        m_P[0] = m_C[0];  // starting value
+        for (size_t i = 1; i < m_P.size(); i++)
+            m_P[i] = m_C[i] - m_C[i - 1];  // incremental probability mass
+    }
 }
 
 /**
  * Compute the average value
  * The calculation depends on how the data are stored
  */
-double RandomVar::Average() {
+double RandomVar::Average()  {
     double expectation = 0.0;
     // from probability mass
     if (m_type == 0) {
@@ -101,14 +139,14 @@ double RandomVar::Average() {
 /**
  * Synonym for Average
  */
-double RandomVar::Mean() {
+double RandomVar::Mean()  {
     return Average();
 }
 
 /**
  * Median as Quantile(0.5)
  */
-double RandomVar::Median() {
+double RandomVar::Median()  {
     return Quantile(0.5);
 }
 
@@ -116,7 +154,7 @@ double RandomVar::Median() {
  * Compute the variance
  * The calculation depends on how the data are stored
  */
-double RandomVar::Variance() {
+double RandomVar::Variance()  {
     double var = 0;
     double mean = Average();
     if (m_type == 0) {
@@ -134,11 +172,10 @@ double RandomVar::Variance() {
 /**
  * Compute volatility (standard deviation)
  */
-double RandomVar::Vol() {
+double RandomVar::Vol()  {
     return sqrt(Variance());
 }
-
-double RandomVar::StandardDeviation() {
+double RandomVar::StandardDeviation()  {
     return Vol();
 }
 
@@ -146,8 +183,7 @@ double RandomVar::StandardDeviation() {
  * Compute the skeweness
  * The calculation depends on how the data are stored
  */
-// TODO Type 1 calculation
-double RandomVar::Skeweness() {
+double RandomVar::Skeweness()  {
     double skew = 0;
     if (m_type == 0) {
         double mean = Average();
@@ -162,10 +198,9 @@ double RandomVar::Skeweness() {
  * Compute the kurtosis
  * The calculation depends on how the data are stored
  */
-// TODO Type 1 calculation
-double RandomVar::Kurtosis() {
+double RandomVar::Kurtosis()  {
     double kurt = 0;
-    if (m_type == 0) {
+    if (m_type == 0){
         double mean = Average();
         for (size_t i = 0; i < m_P.size(); i++)
             kurt += m_P[i] * pow(m_X[i] - mean, 4);
@@ -178,10 +213,10 @@ double RandomVar::Kurtosis() {
  * Compute the Quantile Index
  * The calculation depends on how the data are stored
  */
-// TODO Type 1 calculation
 int RandomVar::Quantile_Index(double alpha) {
     int index = 0;
-    if (m_type == 0) {
+    if (m_type == 0)
+    {
         for (int i = 0; i < m_P.size(); i++) {
             if (m_C[i] > 1 - alpha) {
                 index = i;
@@ -199,11 +234,10 @@ int RandomVar::Quantile_Index(double alpha) {
  * Compute the Quantile
  * The calculation depends on how the data are stored
  */
-// TODO Type 1 calculation
-double RandomVar::Quantile(double alpha) {
+double RandomVar::Quantile(double alpha)  {
     double q;
     int index = this->Quantile_Index(alpha);
-    if (m_type == 0) {
+    if (m_type ==0) {
         q = m_X[index];
     }
     else if (m_type == 1){
@@ -215,15 +249,14 @@ double RandomVar::Quantile(double alpha) {
 /**
  * Compute Value-at-Risk
  */
-double RandomVar::VaR(double alpha) {
+double RandomVar::VaR(double alpha)  {
     return Quantile(1.0 - alpha);
 }
 
 /**
  * Compute Expected Shortfall
  */
-// TODO Type 1 calculation
-double RandomVar::ExpectedShortFall(double alpha) {
+double RandomVar::ExpectedShortFall(double alpha)  {
     double es = 0;
     if (m_type == 0) {
         int iVaR = this->Quantile_Index(alpha);
@@ -238,10 +271,9 @@ double RandomVar::ExpectedShortFall(double alpha) {
 /**
  * Compute Expeedance Probability
  */
-// TODO Type 1 calculation
-double RandomVar::ExceedanceProbability(int index) {
+double RandomVar::ExceedanceProbability(int index)  {
     double ep = 0;
-    if (m_type == 0) {
+    if (m_type == 0){
         for (size_t k = index; k < m_P.size(); k++)
             ep += m_P[k];
     }
@@ -251,8 +283,7 @@ double RandomVar::ExceedanceProbability(int index) {
 /**
  * Compute Mean Excess
  */
-// TODO Type 1 calculation
-double RandomVar::MeanExcess(int index) {
+double RandomVar::MeanExcess(int index)  {
     double mx = 0;
     if (m_type == 0) {
         double alpha = ExceedanceProbability(index);
@@ -266,7 +297,7 @@ double RandomVar::MeanExcess(int index) {
 /**
  * overload << operator
  */
-std::ostream &operator<<(std::ostream &os, const RandomVar &R) {
+std::ostream &operator<<(std::ostream &os,  RandomVar &R) {
     std::ostringstream out;
     for (size_t k = 0; k < R.size(); k++)
         out << R.getX(k) << "\t" << R.getP(k) << "\t" << R.getC(k) << std::endl;
@@ -292,7 +323,7 @@ void RandomVar::Print() {
  * Read random variable from JSON
  * @param fileName
  */
-void RandomVar::ReadFromJSON(const std::string &filename) {
+void RandomVar::ReadFromJSON(std::string &filename) {
 
     // Random variable data are an array of objects
     //[

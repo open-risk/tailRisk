@@ -23,7 +23,12 @@ set(SOURCE_FILES
 
 set(TEST_FILES
         testing/test_random_var_bernulli.cpp
-        testing/test_random_var_beta.cpp testing/test_random_var_binomial.cpp testing/test_random_var_normal.cpp testing/test_random_var_uniform.cpp)
+        testing/test_random_var_beta.cpp
+        testing/test_random_var_binomial.cpp
+        testing/test_random_var_normal.cpp
+        testing/test_random_var_uniform.cpp
+        testing/test_random_var_exponential.cpp
+        )
 
 find_package(Poco REQUIRED COMPONENTS Foundation JSON)
 find_package(Catch2)

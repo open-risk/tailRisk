@@ -31,7 +31,7 @@
 #include <Eigen/Dense>
 
 class RandomVar {
-    friend std::ostream &operator<<(std::ostream &os, const RandomVar &R);
+    friend std::ostream &operator<<(std::ostream &os, RandomVar &R);
 
 public:
 
@@ -70,13 +70,14 @@ public:
         }
     }
 
-    // overload assignment operator
-    RandomVar &operator=(const RandomVar &R);
+    explicit RandomVar(Eigen::ArrayXd &x) {
+        m_type = 1;
+        m_size = x.size();
+        m_S = x;
+    }
 
-    /**
-     *
-     * @return
-     */
+    RandomVar &operator=(RandomVar &R);
+
     [[nodiscard]] size_t size() const {
         return m_size;
     };
@@ -123,12 +124,11 @@ public:
 
     [[nodiscard]] double MeanExcess(int index);
 
-    [[nodiscard]] int Quantile_Index(double alpha);
-
     [[nodiscard]] double Quantile(double alpha);
 
     [[nodiscard]] double VaR(double alpha);
 
+    [[nodiscard]] int Quantile_Index(double alpha);
 
     void setP(int index, double arg) {
         m_P[index] = arg;
@@ -136,6 +136,10 @@ public:
 
     void setC(int index, double arg) {
         m_C[index] = arg;
+    };
+
+    void addP(int index, double arg) {
+        m_P[index] += arg;
     };
 
     void setX(int index, double arg) {
@@ -148,17 +152,19 @@ public:
 
     void Sort();
 
+    RandomVar Histogram(int Bins);
+
     void Cumulative();
 
     void Probability();
 
-    void ReadFromJSON(const std::string &filename);
+    void ReadFromJSON(std::string &filename);
 
     void Print();
 
 private:
-    // 0 Type: exact representation
-    // 1 Type: sampling representation
+    // 0 Type: exact representation (discrete probabilities view)
+    // 1 Type: sampling representation (distribution sampling view)
     int m_type;
 
     int m_size;
@@ -168,7 +174,9 @@ private:
     Eigen::ArrayXd m_P{}; // storage of probability mass
     Eigen::ArrayXd m_C{}; // storage of cumulative probability
     Eigen::ArrayXd m_X{}; // storage of discrete values (random variable range)
+    // 1 Type Storage:
     Eigen::ArrayXd m_S{}; // storage of sampling data from simulation experiments
+
 };
 
 #endif
