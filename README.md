@@ -10,7 +10,7 @@ A C++ library for the calculation of various tail risk measures
 
 ## Dependencies
 
-* Armadillo (Data container and calculation library)
+* Eigen (Data container and calculation library)
 * Poco (For parsing JSON inputs)
 * Stats (A C++ header-only library of statistical distribution functions.)
 

@@ -76,7 +76,7 @@ public:
         m_S = x;
     }
 
-    RandomVar &operator=(RandomVar &R);
+    RandomVar &operator=(const RandomVar &R);
 
     [[nodiscard]] size_t size() const {
         return m_size;
@@ -171,9 +171,11 @@ private:
 
     bool m_sorted = false;
 
+    // 0 Type Storage:
     Eigen::ArrayXd m_P{}; // storage of probability mass
     Eigen::ArrayXd m_C{}; // storage of cumulative probability
     Eigen::ArrayXd m_X{}; // storage of discrete values (random variable range)
+
     // 1 Type Storage:
     Eigen::ArrayXd m_S{}; // storage of sampling data from simulation experiments
 

@@ -22,13 +22,13 @@ set(SOURCE_FILES
         random_var.h)
 
 set(TEST_FILES
-        testing/test_random_var_bernulli.cpp
-        testing/test_random_var_beta.cpp
-        testing/test_random_var_binomial.cpp
-        testing/test_random_var_normal.cpp
-        testing/test_random_var_uniform.cpp
-        testing/test_random_var_exponential.cpp
-        )
+        testing/rnd_statistics/test_random_var_bernulli.cpp
+        testing/rnd_statistics/test_random_var_beta.cpp
+        testing/rnd_statistics/test_random_var_binomial.cpp
+        testing/rnd_statistics/test_random_var_normal.cpp
+        testing/rnd_statistics/test_random_var_uniform.cpp
+        testing/rnd_statistics/test_random_var_exponential.cpp
+        testing/test_histogram.cpp)
 
 find_package(Poco REQUIRED COMPONENTS Foundation JSON)
 find_package(Catch2)

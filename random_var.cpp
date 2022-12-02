@@ -39,7 +39,7 @@ using namespace Poco;
  * @param R
  * @return
  */
-RandomVar &RandomVar::operator=( RandomVar &R) {
+RandomVar &RandomVar::operator=(const RandomVar &R) {
     assert(R.size() == this->size()); // check that size matches
     if (m_type == 0) {
         for (size_t i = 0; i < R.size(); i++) {
@@ -61,7 +61,7 @@ RandomVar &RandomVar::operator=( RandomVar &R) {
  */
 void RandomVar::Sort() {
     if (m_type == 1) {
-        if (m_sorted == false) {
+        if (!m_sorted) {
             std::sort(m_S.begin(), m_S.end());
         }
         m_sorted = true;
@@ -82,7 +82,7 @@ RandomVar RandomVar::Histogram(int Bins) {
         double bin_width = (max_value - min_value)/ (double) Bins;
         double sample_p = 1.0 / m_size;
         for (int i = 0; i < Bins + 1; i++) {
-            H.setX(i, min_value + bin_width * (double) i / 2.0);
+            H.setX(i, min_value + bin_width / 2.0 +  (double) (i) * bin_width);
             H.setP(i, 0.0);
         }
         for (int j = 0; j < m_size; j++) {
