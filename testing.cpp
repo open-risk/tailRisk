@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2020-2022 Open Risk (www.openriskmanagement.com)
+  ##   Copyright (C) 2020-2023 Open Risk (www.openriskmanagement.com)
   ##
   ##   This file is part of the tailRisk C++ library.
   ##
@@ -25,7 +25,7 @@
  */
 
 #include "stats.hpp"
-#include "random_var.h"
+#include "src/random_var.h"
 
 int main(int argc, char *argv[]) {
 

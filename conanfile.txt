@@ -1,8 +1,0 @@
-[requires]
-eigen/3.4.0
-statslib/3.2.0
-
-[generators]
-cmake
-cmake_find_package
-cmake_paths

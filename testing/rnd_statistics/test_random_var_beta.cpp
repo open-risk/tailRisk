@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2020-2022 Open Risk (www.openriskmanagement.com)
+  ##   Copyright (C) 2020-2023 Open Risk (www.openriskmanagement.com)
   ##
   ##   This file is part of the tailRisk C++ library.
   ##
@@ -21,7 +21,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include "stats.hpp"
-#include "random_var.h"
+#include "../../src/random_var.h"
 
 double beta_mean(size_t number, double param1, double param2) {
     RandomVar myR(number, 1);
