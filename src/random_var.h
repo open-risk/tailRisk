@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2020-20223 Open Risk (www.openriskmanagement.com)
+  ##   Copyright (C) 2020-2024 Open Risk (www.openriskmanagement.com)
   ##
   ##   This file is part of the tailRisk C++ library.
   ##
@@ -35,9 +35,9 @@ class RandomVar {
 
 public:
 
-    // constructor with size and empirical distribution type
-    // Type 0 -> histogram storage
-    // Type 1 -> sample storage
+    // Constructor with size and empirical distribution type
+    // Type 0 -> Histogram type Storage
+    // Type 1 -> Sample type Storage
 
     RandomVar(size_t S, int type) {
         if (type == 0) {
@@ -51,12 +51,11 @@ public:
             m_S.resize(S);
             m_size = S;
         } else {
-            std::cout << "Error in random variable representation type" << std::endl;
+            std::cout << "Error in Random Variable representation type: Must be 0 or 1" << std::endl;
         }
     }
 
     // constructor directly from existing data
-    // TODO generalize data type to accommodate different accuracy requirements
 
     RandomVar(Eigen::ArrayXd x, Eigen::ArrayXd p, const int size) {
         m_type = 0;
@@ -86,6 +85,8 @@ public:
         return m_type;
     };
 
+    // Getters and Setters
+
     [[nodiscard]] double getP(int index) const {
         return m_P[index];
     };
@@ -101,6 +102,30 @@ public:
     [[nodiscard]] double getS(int index) const {
         return m_S[index];
     };
+
+    void setP(int index, double arg) {
+        m_P[index] = arg;
+    };
+
+    void setC(int index, double arg) {
+        m_C[index] = arg;
+    };
+
+    void setX(int index, double arg) {
+        m_X[index] = arg;
+    };
+
+    void setS(int index, double arg) {
+        m_S[index] = arg;
+    };
+
+    // Increment probability mass
+
+    void addP(int index, double arg) {
+        m_P[index] += arg;
+    };
+
+    // Statistical Measures
 
     [[nodiscard]] double Average();
 
@@ -130,25 +155,7 @@ public:
 
     [[nodiscard]] int Quantile_Index(double alpha);
 
-    void setP(int index, double arg) {
-        m_P[index] = arg;
-    };
-
-    void setC(int index, double arg) {
-        m_C[index] = arg;
-    };
-
-    void addP(int index, double arg) {
-        m_P[index] += arg;
-    };
-
-    void setX(int index, double arg) {
-        m_X[index] = arg;
-    };
-
-    void setS(int index, double arg) {
-        m_S[index] = arg;
-    };
+    // Various Operations
 
     void Sort();
 
@@ -161,6 +168,8 @@ public:
     void ReadFromJSON(std::string &filename);
 
     void Print();
+
+    void Seed();
 
 private:
     // 0 Type: exact representation (discrete probabilities view)

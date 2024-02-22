@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2020-2023 Open Risk (www.openriskmanagement.com)
+  ##   Copyright (C) 2020-2024 Open Risk (www.openriskmanagement.com)
   ##
   ##   This file is part of the tailRisk C++ library.
   ##
@@ -30,11 +30,23 @@
 
 int main(int argc, char *argv[]) {
 
+    // Example 1
+    int Grid = 1;
+    int DataType = 0;
+    RandomVar D(Grid, DataType);
+    std::string filename =  "../data/example1.json";
+    D.ReadFromJSON(filename);
+    D.Print();
+    D.Cumulative();
+    D.Probability();
+
+    // Example 5
     // Reading in some data for a type 0 representation (discrete distribution)
     int LossGrid = 1000;
-    int DataType = 0;
+    DataType = 0;
     RandomVar L(LossGrid, DataType);
-    std::string filename =  "../../data/example5.json";
+    // ATTN: Make sure this points to the correct path versus your executable!
+    filename =  "../data/example5.json";
     L.ReadFromJSON(filename);
     L.Print();
 
@@ -53,6 +65,14 @@ int main(int argc, char *argv[]) {
     std::cout << "Expected Shortfall @ " << alpha << ": " << L.ExpectedShortFall(alpha) << std::endl;
     std::cout << "Exceedance Probability: " << L.ExceedanceProbability(threshold) << std::endl;
     std::cout << "Mean Excess: " << L.MeanExcess(threshold ) << std::endl;
+
+    // Working with type 1 representations
+    int SampleSize = 10000;
+    DataType = 1;
+    RandomVar myR(SampleSize, DataType);
+    myR.Seed();
+    RandomVar H = myR.Histogram(10);
+    H.Print();
 
     return 0;
 }

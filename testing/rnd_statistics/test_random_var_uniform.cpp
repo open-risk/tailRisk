@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2020-2023 Open Risk (www.openriskmanagement.com)
+  ##   Copyright (C) 2020-2024 Open Risk (www.openriskmanagement.com)
   ##
   ##   This file is part of the tailRisk C++ library.
   ##
@@ -52,6 +52,11 @@ double uniform_quantile(size_t number, double param1, double param2, double para
 
 //double a_par3 = -1;
 //double b_par3 = 3;
+
+/*
+ * Numbers based on the Stats test
+ * https://github.com/kthohr/stats/blob/master/tests/rand/runif.cpp
+*/
 
 double a_par3 = 0;
 double b_par3 = 1;

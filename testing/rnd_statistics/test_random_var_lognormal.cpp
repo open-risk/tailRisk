@@ -23,37 +23,41 @@
 #include "stats.hpp"
 #include "../../src/random_var.h"
 
-double bernulli_mean(size_t number, double param) {
+double lognormal_mean(size_t number, double param1, double param2) {
     RandomVar myR(number, 1);
     stats::rand_engine_t engine(123776);
     for (int i = 0; i < number; i++) {
-        myR.setS(i, stats::rbern(param, engine));
+        myR.setS(i, stats::rlnorm(param1, param2, engine));
     }
     return myR.Mean();
 }
 
-double bernulli_var(size_t number, double param) {
+double lognormal_var(size_t number, double param1, double param2) {
     RandomVar myR(number, 1);
     stats::rand_engine_t engine(123776);
     for (int i = 0; i < number; i++) {
-        myR.setS(i, stats::rbern(param, engine));
+        myR.setS(i, stats::rlnorm(param1, param2, engine));
     }
     return myR.Variance();
 }
 
 /*
  * Numbers based on the Stats test
- * https://github.com/kthohr/stats/blob/master/tests/rand/rbern.cpp
+ * https://github.com/kthohr/stats/blob/master/tests/rand/rlnorm.cpp
 */
 
-double prob_par = 0.75;
-double m_bernulli_mean = prob_par;
-double m_bernulli_var = prob_par * (1.0 - prob_par);
+double mu2 = 0.1;
+double sigma2 = 1;
+double a_par4 = mu2;
+double b_par4 = sigma2;
 
-TEST_CASE("Bernulli", "[statistics]") {
+double m_lnorm_mean = std::exp(mu2 + sigma2 * sigma2 / 2.0);
+double m_lnorm_var = (std::exp(sigma2 * sigma2) - 1.0) * std::exp(2 * mu2 + sigma2 * sigma2);
+
+TEST_CASE("LogNormal", "[statistics]") {
     SECTION("Mean") {
-        REQUIRE_THAT(bernulli_mean(1000, prob_par), Catch::Matchers::WithinAbs(m_bernulli_mean, 0.01));
+        REQUIRE_THAT(lognormal_mean(100000, a_par4, b_par4), Catch::Matchers::WithinAbs(m_lnorm_mean, 0.01));
     }SECTION("Variance") {
-        REQUIRE_THAT(bernulli_var(1000, prob_par), Catch::Matchers::WithinAbs(m_bernulli_var, 0.01));
+        REQUIRE_THAT(lognormal_var(100000, a_par4, b_par4), Catch::Matchers::WithinAbs(m_lnorm_var, 0.1));
     }
 }

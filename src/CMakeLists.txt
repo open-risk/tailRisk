@@ -1,4 +1,4 @@
- ##  Copyright (C) 2020-2023 Open Risk (www.openriskmanagement.com)
+ ##  Copyright (C) 2020-2024 Open Risk (www.openriskmanagement.com)
  ##
  ##  This file is part of the tailRisk C++ library.
  ##
@@ -36,7 +36,7 @@ include_directories(..)
 include_directories(.)
 
 # tailRisk version
-set(VERSION 0.1.0)
+set(VERSION 0.2.0)
 
 set(SOURCE_FILES
         random_var.cpp
@@ -49,10 +49,10 @@ set(TEST_FILES
         ../testing/rnd_statistics/test_random_var_normal.cpp
         ../testing/rnd_statistics/test_random_var_uniform.cpp
         ../testing/rnd_statistics/test_random_var_exponential.cpp
-        ../testing/test_histogram.cpp
-        ../testing.cpp)
+        ../testing/rnd_statistics/test_random_var_lognormal.cpp
+        ../testing/test_histogram.cpp)
 
-find_package(Poco REQUIRED COMPONENTS Foundation Net NetSSL Util Data DataSQLite)
+find_package(Poco REQUIRED COMPONENTS Foundation Net Util Data)
 find_package(Catch2 REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(statslib REQUIRED)
@@ -65,8 +65,9 @@ target_include_directories(tailRisk PRIVATE ${statslib_INCLUDE_DIRS})
 target_include_directories(tailRisk PRIVATE ${gcem_INCLUDE_DIRS})
 target_link_libraries(tailRisk
         Poco::Foundation
+        Poco::Data
+        Poco::JSON
         Poco::Net
-        Poco::NetSSL
         Poco::Util)
 
 # CATCH2 TESTING
@@ -81,11 +82,10 @@ target_include_directories(unit_testing PRIVATE ${Catch2_INCLUDE_DIRS})
 target_include_directories(unit_testing PRIVATE ${Eigen3_INCLUDE_DIRS})
 target_include_directories(unit_testing PRIVATE ${statslib_INCLUDE_DIRS})
 target_include_directories(unit_testing PRIVATE ${gcem_INCLUDE_DIRS})
-target_link_libraries(unit_testing
+target_link_libraries(unit_testing Catch2::Catch2WithMain
         Poco::Data
-        Poco::DataSQLite
         Poco::Foundation
         Poco::Net
-        Poco::NetSSL
-        Catch2::Catch2WithMain)
+        Poco::Util
+        Poco::JSON)
 

@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2020-2023 Open Risk (www.openriskmanagement.com)
+  ##   Copyright (C) 2020-2024 Open Risk (www.openriskmanagement.com)
   ##
   ##   This file is part of the tailRisk C++ library.
   ##
@@ -49,6 +49,11 @@ double exponential_quantile(size_t number, double param1, double param3) {
     }
     return myR.Quantile(param3);
 }
+
+/*
+ * Numbers based on the Stats test
+ * https://github.com/kthohr/stats/blob/master/tests/rand/rexp.cpp
+*/
 
 double rate_par = 0.8;
 double a_par1 = rate_par;

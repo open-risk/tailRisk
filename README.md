@@ -7,18 +7,17 @@ A C++ library for the calculation of various tail risk measures
 * Implemented [Risk Measures](RiskMeasures.md)
 * Mathematical Documentation available [here](https://www.openriskmanual.org/wiki/Category:Tail_Risk) 
 
-
 ## Dependencies
 
-* Eigen (Data container and calculation library)
-* Poco (For parsing JSON inputs)
+* Eigen (Data container and linear algebra calculation library)
+* Poco (For parsing JSON inputs and other utilities)
 * Stats (A C++ header-only library of statistical distribution functions.)
 
 ## Example
 The data directory contains sample datafiles with various sampled distributions
 
 ```c++
-    // Read in some data for a type 0 representation (discrete distribution)
+// Read in some data for a type 0 representation (discrete distribution)
 int LossGrid = 1000;
 int DataType = 0;
 RandomVar L(LossGrid, DataType);

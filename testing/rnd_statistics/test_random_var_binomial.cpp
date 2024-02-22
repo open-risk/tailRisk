@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2020-2023 Open Risk (www.openriskmanagement.com)
+  ##   Copyright (C) 2020-2024 Open Risk (www.openriskmanagement.com)
   ##
   ##   This file is part of the tailRisk C++ library.
   ##
@@ -40,6 +40,11 @@ double binomial_var(size_t number, int param1, double param2) {
     }
     return myR.Variance();
 }
+
+/*
+ * Numbers based on the Stats test
+ * https://github.com/kthohr/stats/blob/master/tests/rand/rbinom.cpp
+*/
 
 int n_trials = 10;
 double prob_par1 = 0.75;

@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2020-2023 Open Risk (www.openriskmanagement.com)
+  ##   Copyright (C) 2020-2024 Open Risk (www.openriskmanagement.com)
   ##
   ##   This file is part of the tailRisk C++ library.
   ##
@@ -49,6 +49,11 @@ double beta_quantile(size_t number, double param1, double param2, double param3)
     }
     return myR.Quantile(param3);
 }
+
+/*
+ * Numbers based on the Stats test
+ * https://github.com/kthohr/stats/blob/master/tests/rand/rbeta.cpp
+*/
 
 double a_par = 3.0;
 double b_par = 2.0;

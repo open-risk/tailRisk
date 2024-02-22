@@ -1,6 +1,6 @@
 /*################################################################################
  ##
- ##  Copyright (C) 2020-2023 Open Risk (www.openriskmanagement.com)
+ ##  Copyright (C) 2020-2024 Open Risk (www.openriskmanagement.com)
  ##
  ##  This file is part of the tailRisk C++ library.
  ##
@@ -30,6 +30,7 @@
 
 
 #include <Poco/JSON/Parser.h>
+#include "stats.hpp"
 #include "random_var.h"
 
 using namespace Poco;
@@ -57,7 +58,7 @@ RandomVar &RandomVar::operator=(const RandomVar &R) {
 };
 
 /**
- * Sort the sampling data
+ * Sort the sampling data if Type 1, else do nothing
  */
 void RandomVar::Sort() {
     if (m_type == 1) {
@@ -74,21 +75,27 @@ void RandomVar::Sort() {
  * Bins are assumed equal and represented by their mid-point values
  */
 RandomVar RandomVar::Histogram(int Bins) {
-    RandomVar H(Bins+1,0);
+    RandomVar H(Bins,0);
     if (m_type == 1) {
         std::sort(m_S.begin(), m_S.end());
         double min_value = m_S[0];
         double max_value = m_S[m_S.size()-1];
         double bin_width = (max_value - min_value)/ (double) Bins;
         double sample_p = 1.0 / m_size;
-        for (int i = 0; i < Bins + 1; i++) {
-            H.setX(i, min_value + bin_width / 2.0 +  (double) (i) * bin_width);
+        for (int i = 0; i < Bins; i++) {
+            double x = min_value + bin_width / 2.0 +  (double) (i) * bin_width;
+            H.setX(i, x);
             H.setP(i, 0.0);
+            H.setC(i, 0.0);
         }
         for (int j = 0; j < m_size; j++) {
             int observation_bin = (int) ( (m_S[j] - min_value) / bin_width );
+            if (observation_bin > Bins - 1) {
+                observation_bin = Bins - 1;
+            }
             H.addP(observation_bin, sample_p);
         }
+        H.Cumulative();
     }
     return H;
 }
@@ -359,5 +366,17 @@ void RandomVar::ReadFromJSON(std::string &filename) {
         this->setX(i, object->getValue<double>("value"));
         this->setP(i, object->getValue<double>("probability"));
         this->setC(i, object->getValue<double>("cumulative"));
+    }
+}
+
+/**
+ * Seed with a sampled distribution
+ */
+void RandomVar::Seed() {
+    if (m_type == 1) {
+        stats::rand_engine_t engine(12376);
+        for (int i = 0; i < this->m_size; i++) {
+            this->setS(i, stats::runif(0.0, 1.0, engine));
+        }
     }
 }
