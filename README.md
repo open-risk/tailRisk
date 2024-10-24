@@ -2,10 +2,11 @@
 A C++ library for the calculation of various tail risk measures
 
 ## Documentation
+
 **NB: Documentation still under development.**
 
-* Implemented [Risk Measures](RiskMeasures.md)
-* Mathematical Documentation available [here](https://www.openriskmanual.org/wiki/Category:Tail_Risk) 
+* [User Manual](https://www.openriskmanagement.com/documentation/tailrisk/)
+* Mathematical Documentation is available int Open Risk Manual Tail Risk [category](https://www.openriskmanual.org/wiki/Category:Tail_Risk) 
 
 ## Dependencies
 

@@ -30,11 +30,17 @@
 
 int main(int argc, char *argv[]) {
 
+    // Example 0
+    RandomVar X;
+    std::string filename =  "../data/example0.json";
+    X.ReadFromJSON(filename);
+    X.Print();
+
     // Example 1
     int Grid = 1;
     int DataType = 0;
     RandomVar D(Grid, DataType);
-    std::string filename =  "../data/example1.json";
+    filename =  "../data/example1.json";
     D.ReadFromJSON(filename);
     D.Print();
     D.Cumulative();

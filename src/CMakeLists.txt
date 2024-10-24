@@ -18,9 +18,13 @@
  set(PROJECT_VENDOR "Open Risk")
  set(PROJECT_CONTACT "info@openrisk.eu")
  set(PROJECT_URL "https://github.com/open-risk/tailRisk")
+ set(PROJECT_DESCRIPTION "tailRisk is a library for computing tail risk measures")
 
 cmake_minimum_required(VERSION 3.19)
 project(tailRisk)
+ set(TAILRISK_VERSION_MAJOR 0)
+ set(TAILRISK_VERSION_MINOR 2)
+ set(TAILRISK_VERSION_PATCH 0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS -std=c++17)
@@ -29,8 +33,7 @@ add_definitions("-std=c++17")
 set(CMAKE_VERBOSE_MAKEFILE on)
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS_DEBUG)
-#set(CONAN_DISABLE_CHECK_COMPILER ON)
-set(CMAKE_PREFIX_PATH ../cmake-build-debug)
+set(CMAKE_PREFIX_PATH cmake-build-debug)
 
 include_directories(..)
 include_directories(.)
@@ -52,7 +55,7 @@ set(TEST_FILES
         ../testing/rnd_statistics/test_random_var_lognormal.cpp
         ../testing/test_histogram.cpp)
 
-find_package(Poco REQUIRED COMPONENTS Foundation Net Util Data)
+find_package(Poco REQUIRED COMPONENTS Foundation Net NetSSL Util Data)
 find_package(Catch2 REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(statslib REQUIRED)

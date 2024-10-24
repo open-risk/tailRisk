@@ -39,6 +39,8 @@ public:
     // Type 0 -> Histogram type Storage
     // Type 1 -> Sample type Storage
 
+    RandomVar();
+
     RandomVar(size_t S, int type) {
         if (type == 0) {
             m_type = 0;
@@ -170,6 +172,7 @@ public:
     void Print();
 
     void Seed();
+
 
 private:
     // 0 Type: exact representation (discrete probabilities view)

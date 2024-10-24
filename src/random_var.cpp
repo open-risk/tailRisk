@@ -1,4 +1,5 @@
-/*################################################################################
+/**
+ ################################################################################
  ##
  ##  Copyright (C) 2020-2024 Open Risk (www.openriskmanagement.com)
  ##
@@ -16,7 +17,8 @@
  ##  See the License for the specific language governing permissions and
  ##  limitations under the License.
  ##
- ################################################################################*/
+ ################################################################################
+ */
 
 /**
  * File: random_var.cpp
@@ -379,4 +381,8 @@ void RandomVar::Seed() {
             this->setS(i, stats::runif(0.0, 1.0, engine));
         }
     }
+}
+
+RandomVar::RandomVar() {
+
 }
