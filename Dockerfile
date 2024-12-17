@@ -16,7 +16,7 @@
 FROM ubuntu:22.04
 
 LABEL description="tailRisk: A library for computing risk measures"
-LABEL maintainer="info@openrisk.eu"
+LABEL maintainer="info@openriskmanagement.com"
 LABEL version="0.2"
 LABEL author="Open Risk <www.openriskmanagement.com>"
 
