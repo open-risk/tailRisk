@@ -16,7 +16,7 @@
 
  # Project metadata
  set(PROJECT_VENDOR "Open Risk")
- set(PROJECT_CONTACT "info@openrisk.eu")
+ set(PROJECT_CONTACT "info@openriskmanagement.com")
  set(PROJECT_URL "https://github.com/open-risk/tailRisk")
  set(PROJECT_DESCRIPTION "tailRisk is a library for computing tail risk measures")
 
