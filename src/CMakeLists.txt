@@ -1,4 +1,4 @@
- ##  Copyright (C) 2020-2024 Open Risk (www.openriskmanagement.com)
+ ##  Copyright (C) 2020-2026 Open Risk (www.openriskmanagement.com)
  ##
  ##  This file is part of the tailRisk C++ library.
  ##
