@@ -1,4 +1,5 @@
 # tailRisk
+
 A C++ library for the calculation of various tail risk measures
 
 ## Documentation
@@ -14,7 +15,8 @@ A C++ library for the calculation of various tail risk measures
 * Poco (For parsing JSON inputs and other utilities)
 * Stats (A C++ header-only library of statistical distribution functions.)
 
-## Example
+## Example Usage
+
 The data directory contains sample datafiles with various sampled distributions
 
 ```c++
